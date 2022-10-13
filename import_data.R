@@ -21,6 +21,7 @@ colnames.22 <- c("stevilo_nesrec", "klasifikacija_nesrece",
 year <- list.files(pattern = "^(?i)pn\\d{2}\\.txt", recursive = TRUE)
 out <- list()
 
+message("processing data 1995-2004")
 for (i in seq_along(year)) {
   out[[i]] <- read.fwf(
     file = year[i],
@@ -30,18 +31,21 @@ for (i in seq_along(year)) {
 }
 
 result <- do.call(rbind, out)
+colnames(result) <- colnames.95
 
 year05 <- list.files(pattern = "^pn\\d{4}\\.csv$", recursive = TRUE)
 out <- list()
 
+message("processing data 2005+")
 for (i in seq_along(year)) {
-  out[[i]] <- read.fwf(
+  out[[i]] <- read.table(
     file = year05[1],
-    header = FALSE,
-    widths = col.width,
-    fileEncoding = "CP852")
+    header = TRUE,
+    sep = ";",
+    fileEncoding = "ISO-8859-1")
 }
 
 result05 <- do.call(rbind, out)
+# colnames(result05) <- colnames.22
 
 save(result, result05, file = "./data/raw_data_1995_2021.RData")
