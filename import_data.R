@@ -6,42 +6,48 @@ colnames.95 <- c("stevila_zadeve", "klas", "upr_enota", "datum", "ura",
   "tip_nesrece", "vreme", "stanje_prometa", "stanje_povrsine",
   "stanje_vozisca")
 
-colnames.22 <- c("stevilo_nesrec", "klasifikacija_nesrece",
-                 "upravna_enota_nesrece", "datum_nesrece",
-                 "ura_nesrece", "nesreca_v_neselju",
-                 "katagorije_ceste_nesrece", "oznak_odseka_nesrece",
-                 "tekst_ceste_ali_naselja_nesrece",
-                 "oznaka_ceste_ali_ulive_nesrece",
-                 "tekst_odseka_ali_ulice_nesrece",
-                 "tocka_hisna_stevilka_nesrece", "opis_prizorisca_nesrece",
-                 "vzrok_nesrece", "tip_nesrece", "vreme_okolje_nesrece",
-                 "stanje_prometa_nesrece",
-                 "stanje_prometa_nesrece")
+files2000 <- list.files(path = "data", pattern = "^(?i)pn\\d{2}\\.txt", full.names = TRUE)
+out2000 <- list()
 
-year <- list.files(pattern = "^(?i)pn\\d{2}\\.txt", recursive = TRUE)
-out <- list()
-
-for (i in seq_along(year)) {
-  out[[i]] <- read.fwf(
-    file = year[i],
+for (i in seq_along(files2000)) {
+  message(sprintf("Processing %s", files2000[i]))
+  out2000[[i]] <- read.fwf(
+    file = files2000[i],
     header = FALSE, 
     widths = col.width,
     fileEncoding = "CP852")
 }
+pn2000 <- do.call(rbind, out2000)
+colnames(pn2000) <- colnames.95
 
-result <- do.call(rbind, out)
+files2004 <- list.files(path = "data/prenosi/PN", pattern = "^PN\\d{2}\\.txt", full.names = TRUE)
+out2004 <- list()
 
-year05 <- list.files(pattern = "^pn\\d{4}\\.csv$", recursive = TRUE)
-out <- list()
-
-for (i in seq_along(year)) {
-  out[[i]] <- read.fwf(
-    file = year05[1],
+for (i in seq_along(files2004)) {
+  message(sprintf("Processing %s", files2004[i]))
+  out2004[[i]] <- read.table(
+    file = files2004[i],
     header = FALSE,
-    widths = col.width,
-    fileEncoding = "CP852")
+    sep = "$",
+    fileEncoding = "Windows-1250")
+}
+pn2004 <- do.call(rbind, out2004)
+colnames(pn2004) <- colnames.95
+
+pn2004 <- rbind(pn2000, pn2004)
+
+files2021 <- list.files(path = "data", pattern = "^pn\\d{4}\\.csv$", full.names = TRUE)
+out2021 <- list()
+
+for (i in seq_along(files2021)) {
+  message(sprintf("Processing %s", files2021[i]))
+  out2021[[i]] <- read.table(
+    file = files2021[i],
+    header = TRUE,
+    sep = ";",
+    fileEncoding = "Windows-1250")
 }
 
-result05 <- do.call(rbind, out)
+pn2021 <- do.call(rbind, out2021)
 
-save(result, result05, file = "./data/raw_data_1995_2021.RData")
+save(pn2004, pn2021, file = "./data/raw_accident_data_1995_2021.RData")
