@@ -22,7 +22,7 @@ Calculate number of accidents per day.
 nad2004 <- aggregate(stevila_zadeve ~ datum, data = pn2004, FUN = length)
 colnames(nad2004) <- c("datum", "num_accidents")
 
-nad2021 <- aggregate(ZaporednaStevilkaPN ~ DatumPN, data = pn2021, FUN = length)
+nad2021 <- aggregate(ZaporednaStevilkaPN ~ DatumPN, data = pn2021, FUN = function(x) length(unique(x)))
 colnames(nad2021) <- c("datum", "num_accidents")
 
 nad <- rbind(nad2004, nad2021)
@@ -38,5 +38,9 @@ ggplot(nad, aes(x = datum, y = num_accidents)) +
   geom_hline(data = yearly.avg, aes(yintercept = num_accidents), color = "grey20") +
   facet_wrap(~ year, scales = "free_x", ncol = 1, strip.position = "right")
 ggsave("./figures/figure-2-num-accidents-in-time.pdf", width = 8, height = 24)
+```
+
+```{r}
+save(nad, file = "./data/num_acc_year.RData")
 ```
 
