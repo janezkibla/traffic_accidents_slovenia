@@ -5,7 +5,7 @@
 source("functions.R")
 dir.create("data", showWarnings = FALSE)
 
-for (i in 1995:2021) {
+for (i in 1995:2023) {
   pnDataDownloader(year = i)
 }
 
