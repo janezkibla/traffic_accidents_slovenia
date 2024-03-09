@@ -9,23 +9,22 @@ library(ggplot2)
 ```
 
 ```{r}
-load("./data/raw_accident_data_1995_2021.RData")
+load(file.path("data", "raw_accident_data.RData"))
 
-pn2004$datum <- as.Date(pn2004$datum, format = "%d.%m.%Y")
-pn2021$DatumPN <- as.Date(pn2021$DatumPN, format = "%d.%m.%Y")
+rad <- raw.accident.data
+rm(raw.accident.data)
 
-pn2021[!duplicated(pn2021$ZaporednaStevilkaPN), ]
+rad$DatumPN <- as.Date(rad$DatumPN, format = "%d.%m.%Y")
 ```
 
 Calculate number of accidents per day.
 ```{r}
-nad2004 <- aggregate(stevila_zadeve ~ datum, data = pn2004, FUN = length)
-colnames(nad2004) <- c("datum", "num_accidents")
+nad <- aggregate(
+  ZaporednaStevilkaPN ~ DatumPN, data = rad,
+  FUN = function(x) length(unique(x))
+)
+colnames(nad) <- c("datum", "num_accidents")
 
-nad2021 <- aggregate(ZaporednaStevilkaPN ~ DatumPN, data = pn2021, FUN = function(x) length(unique(x)))
-colnames(nad2021) <- c("datum", "num_accidents")
-
-nad <- rbind(nad2004, nad2021)
 nad$year <- format(nad$datum, format = "%Y")
 
 yearly.avg <- aggregate(num_accidents ~ year, data = nad, FUN = mean)
@@ -37,10 +36,10 @@ ggplot(nad, aes(x = datum, y = num_accidents)) +
   geom_col() +
   geom_hline(data = yearly.avg, aes(yintercept = num_accidents), color = "grey20") +
   facet_wrap(~ year, scales = "free_x", ncol = 1, strip.position = "right")
-ggsave("./figures/figure-2-num-accidents-in-time.pdf", width = 8, height = 24)
+
+ggsave(file.path("figures", "figure-2-num-accidents-in-time.pdf"), width = 8, height = 24)
 ```
 
 ```{r}
-save(nad, file = "./data/num_acc_year.RData")
+save(nad, file = file.path("data", "num_acc_year.RData"))
 ```
-
