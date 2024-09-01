@@ -89,3 +89,18 @@ geom_histogram()
 
 ggsave(file.path("figures", "figure-3-death-by-gender-and-age.png"),
 width = 600, height = 600, units = "px", dpi = 150)
+
+# Decili starosti za smrtne izide.
+# To nam pove koliko odstotkov ljudi umre, na primer:
+#
+# > quantile(smrti$Starost, probs = seq(0, 1, by = 0.1))
+  # 0%  10%  20%  30%  40%  50%  60%  70%  80%  90% 100% 
+  #  2   20   23   27   31   37   42   48   55   67   95
+#
+# Polovico smrtnih žrtev je mlajših od 37 let. 
+smrti <- rad[
+  rad$KlasifikacijaNesrece %in% c("S SMRTNIM IZIDOM", "SMRT") & 
+  rad$Povzrocitelj %in% c("POVZROČITELJ"),
+  ]
+
+quantile(smrti$Starost, probs = seq(0, 1, by = 0.1))
