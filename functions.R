@@ -36,13 +36,17 @@ extractYear <- function(x) {
 findEncoding <- function(year) {
   loe  <- list(
     "UTF-8" = 1995:2004,
-    "Windows-1250" = 2005:2023
+    "Windows-1250" = 2005:2025
   )
 
   find.enc <- sapply(loe, FUN = "==", year)
   find.enc <- sapply(find.enc, FUN = any)
   find.enc <- find.enc[find.enc]
 
+  if (length(find.enc) == 0) {
+    stop("Please check if the year you're looking for is in the mapping table.")
+  }
+  
   if (length(find.enc) > 1) {
     stop("List of encodings includes one year under two encodings. This
     is not compatible. Please check loe in findEncoding().")
